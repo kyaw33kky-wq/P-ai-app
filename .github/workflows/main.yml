@@ -52,4 +52,3 @@ jobs:
         with:
           name: P-AI-APK
           path: project/**/build/outputs/apk/debug/*.apk
-.
