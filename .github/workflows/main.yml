@@ -1,4 +1,4 @@
-name: Build P-Ai APK2
+name: Build P-AI APK2
 
 on:
   workflow_dispatch:
@@ -11,24 +11,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Extract Android project
         run: |
-          mkdir project
+          mkdir -p project
           unzip -q "pai-android-project (1).zip" -d project
 
       - name: Find Gradle project
         run: |
           GRADLEW=$(find project -name gradlew -type f | head -1)
+          if [ -z "$GRADLEW" ]; then
+            echo "ERROR: gradlew not found"
+            exit 1
+          fi
           chmod +x "$GRADLEW"
           echo "GRADLEW=$GRADLEW" >> $GITHUB_ENV
           echo "PROJECT_DIR=$(dirname "$GRADLEW")" >> $GITHUB_ENV
 
       - name: Build APK
         working-directory: ${{ env.PROJECT_DIR }}
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: P-Ai-APK
-          path: "**/build/outputs/apk/debug/*.apk"
+          name: P-AI-APK
+          path: ${{ env.PROJECT_DIR }}/**/build/outputs/apk/debug/*.apk
