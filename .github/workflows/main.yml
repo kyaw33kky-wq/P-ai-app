@@ -25,20 +25,30 @@ jobs:
       - name: Find Gradle project
         run: |
           GRADLEW=$(find project -name gradlew -type f | head -1)
+
           if [ -z "$GRADLEW" ]; then
             echo "ERROR: gradlew not found"
+            find project -maxdepth 3 -type f | head -100
             exit 1
           fi
+
           chmod +x "$GRADLEW"
-          echo "GRADLEW=$GRADLEW" >> $GITHUB_ENV
-          echo "PROJECT_DIR=$(dirname "$GRADLEW")" >> $GITHUB_ENV
+
+          PROJECT_DIR=$(dirname "$GRADLEW")
+
+          echo "GRADLEW=$GRADLEW" >> "$GITHUB_ENV"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+          echo "GRADLEW=$GRADLEW"
+          echo "PROJECT_DIR=$PROJECT_DIR"
 
       - name: Build APK
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          cd "$PROJECT_DIR"
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: P-AI-APK
-          path: ${{ env.PROJECT_DIR }}/**/build/outputs/apk/debug/*.apk
+          path: project/**/build/outputs/apk/debug/*.apk
