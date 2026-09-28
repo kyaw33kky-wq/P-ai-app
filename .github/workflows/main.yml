@@ -1,4 +1,4 @@
-name: Build P-Ai APK
+name: Build P-Ai APK2
 
 on:
   workflow_dispatch:
